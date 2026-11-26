@@ -154,7 +154,7 @@
   let usedPeekThisTurn = false;
   let cleanStreak = 0;
   let flashTimer = null;
-  let advanceGuardUntil = 0;
+  let canAdvance = false;
 
   function getRange() {
     return RANGES.find(r => r.id === config.rangeId) || RANGES[1];
@@ -179,13 +179,11 @@
     if (config.formatId === 'fingers') return 'fingers';
     if (config.formatId === 'dice') return 'dice';
     if (config.formatId === 'dots-prog') {
-      // Progress from two-color conceptual subgroups to single-color irregular plates
       if (cleanStreak >= 4 && Math.random() < 0.55) {
         return 'dots';
       }
       return 'subgroups';
     }
-    // 'mixed' — interleave core representations smoothly
     const pool = cleanStreak >= 4
       ? ['subgroups', 'tenframe', 'dots', 'fingers', 'dice']
       : ['subgroups', 'tenframe', 'fingers', 'dice'];
@@ -207,9 +205,8 @@
     el.keypad.innerHTML = html;
 
     el.keypad.querySelectorAll('.num-btn').forEach(btn => {
-      btn.addEventListener('pointerdown', (e) => {
+      btn.addEventListener('click', () => {
         if (btn.disabled) return;
-        e.preventDefault();
         handleAnswerTap(Number(btn.dataset.num), btn);
       });
     });
@@ -284,6 +281,7 @@
   function returnToSetup() {
     clearFlashTimer();
     phase = 'idle';
+    canAdvance = false;
     el.endScreen.classList.add('hidden');
     el.gameScreen.classList.add('hidden');
     el.setupScreen.classList.remove('hidden');
@@ -299,6 +297,7 @@
     }
 
     phase = 'ready';
+    canAdvance = false;
     currentValue = item.key;
     currentFormat = chooseFormatForTurn();
     hadMissThisTurn = false;
@@ -383,12 +382,20 @@
     }, duration);
   }
 
+  function enableAdvanceNextFrame() {
+    canAdvance = false;
+    requestAnimationFrame(() => {
+      if (phase === 'verified') {
+        canAdvance = true;
+      }
+    });
+  }
+
   function handleAnswerTap(val, btn) {
     if (phase !== 'answering' && phase !== 'retry') return;
 
     if (val === currentValue) {
       phase = 'verified';
-      advanceGuardUntil = performance.now() + 360;
 
       const clean = !hadMissThisTurn && !usedPeekThisTurn;
       if (clean) {
@@ -402,24 +409,21 @@
 
       MatikkaAudio.playCorrect(cleanStreak);
 
-      btn.classList.add('correct');
       setKeypadEnabled(false);
       el.btnPeek.disabled = true;
 
-      // Lift curtain so child verifies visually
+      // Lift curtain immediately to verify visually
       el.curtain.classList.add('open');
       el.stageCard.classList.remove('state-retry');
-      el.stageCard.classList.add('state-correct', 'clickable');
+      el.stageCard.classList.add('state-correct');
 
       el.revealBadge.textContent = String(currentValue);
       el.revealBadge.classList.remove('hidden');
 
-      // Show Seuraava button after brief beat so child sees green selection
-      setTimeout(() => {
-        if (phase !== 'verified') return;
-        el.keypad.classList.add('hidden');
-        el.nextBar.classList.remove('hidden');
-      }, 320);
+      // Swap immediately to Seuraava (no delayed timer race) and arm on next frame
+      el.keypad.classList.add('hidden');
+      el.nextBar.classList.remove('hidden');
+      enableAdvanceNextFrame();
     } else {
       // Gentle correction: lift curtain immediately so child can inspect and tap the right number
       hadMissThisTurn = true;
@@ -439,14 +443,13 @@
   function revealForTeacher() {
     if (phase !== 'answering') return;
     phase = 'verified';
-    advanceGuardUntil = performance.now() + 300;
 
     session.record({ correct: true, assisted: false });
     renderProgress();
     MatikkaAudio.playCorrect(session.progress().completed);
 
     el.curtain.classList.add('open');
-    el.stageCard.classList.add('state-correct', 'clickable');
+    el.stageCard.classList.add('state-correct');
 
     el.revealBadge.textContent = String(currentValue);
     el.revealBadge.classList.add('teacher');
@@ -455,11 +458,12 @@
     el.btnGmPeek.classList.add('hidden');
     el.btnGmReveal.classList.add('hidden');
     el.btnGmNext.classList.remove('hidden');
+    enableAdvanceNextFrame();
   }
 
   function nextTurn() {
-    if (phase !== 'verified') return;
-    if (performance.now() < advanceGuardUntil) return;
+    if (phase !== 'verified' || !canAdvance) return;
+    canAdvance = false;
     MatikkaAudio.playTap();
     if (session.isDone()) {
       finishRound();
@@ -471,6 +475,7 @@
   function finishRound() {
     clearFlashTimer();
     phase = 'idle';
+    canAdvance = false;
     MatikkaAudio.playWin();
     const lines = [
       'Hienosti nähty!',
@@ -508,13 +513,6 @@
   el.btnGmPeek.addEventListener('click', () => runFlash(true));
   el.btnGmReveal.addEventListener('click', revealForTeacher);
   el.btnGmNext.addEventListener('click', nextTurn);
-
-  // Tapping the verified open stage card advances cleanly
-  el.stageCard.addEventListener('click', () => {
-    if (phase === 'verified') {
-      nextTurn();
-    }
-  });
 
   el.btnEndAgain.addEventListener('click', startRound);
 
