@@ -1,5 +1,5 @@
 /* Matikkapelit — Offline PWA Service Worker */
-const CACHE_NAME = 'matikkapelit-cache-v2';
+const CACHE_NAME = 'matikkapelit-cache-v3';
 
 const CORE_ASSETS = [
   './',
@@ -11,6 +11,11 @@ const CORE_ASSETS = [
   './fonts/andika-bold.woff2',
   './img/pikaluku-tile.webp',
   './img/karhu-win.webp',
+  './img/hands/hand-1.webp',
+  './img/hands/hand-2.webp',
+  './img/hands/hand-3.webp',
+  './img/hands/hand-4.webp',
+  './img/hands/hand-5.webp',
   './shared/style.css',
   './shared/audio.js',
   './shared/games.js',
