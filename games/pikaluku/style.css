@@ -1,0 +1,395 @@
+/* Pikaluku (Flash Subitizer) — iPad Landscape First + Clevertouch Taulu */
+
+.pikaluku-screen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100dvh;
+  background: var(--bg-frame);
+  padding: max(12px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  gap: clamp(10px, 1.6vh, 18px);
+}
+
+/* TOP BAR */
+.game-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 48px;
+  flex-shrink: 0;
+}
+
+.progress-dots {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: clamp(6px, 0.9vw, 10px);
+  padding: 6px 12px;
+  background: var(--bg-board);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+}
+
+.prog-dot {
+  width: clamp(14px, 1.5vw, 19px);
+  height: clamp(14px, 1.5vw, 19px);
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  background: var(--surface);
+  transition: transform 180ms ease, background-color 180ms ease, border-color 180ms ease;
+}
+
+.prog-dot.done {
+  background: var(--sage);
+  border-color: var(--sage);
+}
+
+.prog-dot.current {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: scale(1.16);
+}
+
+.topbar-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.btn-peek {
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 13px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: transform 90ms ease, background-color 110ms ease, opacity 120ms ease;
+}
+
+.btn-peek svg {
+  width: 21px;
+  height: 21px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.btn-peek:active:not(:disabled) {
+  transform: scale(0.95);
+  background: var(--bg-panel);
+}
+
+.btn-peek:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* CENTER STAGE */
+.stage-zone {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stage-card {
+  position: relative;
+  width: min(100%, 760px);
+  height: 100%;
+  max-height: 470px;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 26px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(14px, 2.2vh, 26px);
+  transition: border-color 180ms ease;
+}
+
+.stage-card.state-correct {
+  border-color: var(--sage);
+}
+
+.stage-card.state-retry {
+  border-color: var(--ochre);
+}
+
+.stage-card.clickable {
+  cursor: pointer;
+}
+
+.stimulus-layer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qty-svg {
+  width: 100%;
+  height: 100%;
+  max-width: 580px;
+  max-height: 360px;
+  display: block;
+}
+
+/* REVEAL NUMERAL BADGE */
+.reveal-badge {
+  position: absolute;
+  top: clamp(12px, 2vh, 20px);
+  right: clamp(14px, 2vw, 22px);
+  min-width: clamp(64px, 7.5vw, 88px);
+  height: clamp(64px, 7.5vw, 88px);
+  padding: 0 14px;
+  border-radius: 20px;
+  background: var(--sage-soft);
+  border: 3px solid var(--sage);
+  color: var(--sage);
+  font-size: clamp(2.1rem, 4.2vw, 3.1rem);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-shadow: 0 6px 16px rgba(42, 38, 32, 0.08);
+  animation: badgePop 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.reveal-badge.teacher {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@keyframes badgePop {
+  from {
+    opacity: 0;
+    transform: scale(0.75);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* SUBTLE BOTTOM FLASH DURATION HAIRLINE */
+.flash-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 6px;
+  background: rgba(216, 211, 200, 0.4);
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.flash-bar.active {
+  opacity: 1;
+}
+
+.flash-bar-fill {
+  width: 100%;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+/* CURTAIN OVERLAY (Warm tactile tabletop cloth) */
+.curtain {
+  position: absolute;
+  inset: 0;
+  background: var(--bear-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  transform: translateY(0%);
+  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 10;
+}
+
+.curtain.open {
+  transform: translateY(-103%);
+  pointer-events: none;
+}
+
+.curtain-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 18px;
+  border: 2px dashed rgba(74, 68, 62, 0.24);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.curtain-cta {
+  min-width: clamp(190px, 24vw, 250px);
+  min-height: clamp(76px, 11vh, 96px);
+  padding: 0 32px;
+  border-radius: 20px;
+  border: 2.5px solid var(--bear-border);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: clamp(1.5rem, 2.8vw, 2rem);
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  box-shadow: var(--shadow-card);
+  transition: transform 90ms ease, background-color 110ms ease;
+}
+
+.curtain-cta svg {
+  width: clamp(30px, 3.6vw, 38px);
+  height: clamp(30px, 3.6vw, 38px);
+  stroke: var(--accent);
+  fill: none;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.curtain-cta:active {
+  transform: scale(0.96);
+  background: var(--bg-board);
+}
+
+.curtain-question {
+  font-size: clamp(4.2rem, 11vh, 6.4rem);
+  font-weight: 700;
+  color: var(--bear-border);
+  opacity: 0.32;
+  line-height: 1;
+}
+
+/* ANSWER DOCK — CONSTANT RESERVED HEIGHT SO STAGE NEVER JUMPS */
+.answer-dock {
+  flex: 0 0 auto;
+  width: min(100%, 760px);
+  margin: 0 auto;
+  min-height: clamp(134px, 21vh, 176px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.answer-dock.compact {
+  min-height: clamp(76px, 11vh, 96px);
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(8px, 1.3vw, 14px);
+  width: 100%;
+}
+
+.num-btn {
+  min-height: clamp(60px, 9.2vh, 78px);
+  border-radius: 17px;
+  border: 2px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(42, 38, 32, 0.05);
+  transition: transform 80ms ease, background-color 120ms ease, border-color 120ms ease, opacity 140ms ease;
+}
+
+.num-btn:active:not(:disabled) {
+  transform: scale(0.95);
+  background: var(--bg-panel);
+}
+
+.num-btn:disabled {
+  opacity: 0.42;
+  cursor: default;
+  box-shadow: none;
+}
+
+.num-btn.wrong {
+  background: var(--danger-soft);
+  border-color: var(--danger);
+  color: var(--danger);
+  opacity: 0.55;
+}
+
+.num-btn.correct {
+  background: var(--sage);
+  border-color: var(--sage);
+  color: #FFFFFF;
+  opacity: 1;
+  transform: scale(1.03);
+}
+
+.dock-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.dock-action-bar button {
+  min-height: clamp(62px, 9.5vh, 78px);
+  font-size: clamp(1.25rem, 2.2vw, 1.55rem);
+  padding: 0 36px;
+  flex: 1 1 0;
+  max-width: 340px;
+}
+
+.btn-next {
+  background: var(--sage);
+}
+
+/* GAME MASTER (TAULU) MODE — LARGER STAGE FOR CLEVERTOUCH */
+.pikaluku-screen.mode-teacher .stage-card {
+  width: min(100%, 960px);
+  max-height: none;
+}
+
+.pikaluku-screen.mode-teacher .qty-svg {
+  max-width: 740px;
+  max-height: 500px;
+}
+
+.pikaluku-screen.mode-teacher .answer-dock {
+  width: min(100%, 960px);
+}
+
+@media (max-height: 680px) {
+  .pikaluku-screen {
+    gap: 8px;
+  }
+  .answer-dock {
+    min-height: 122px;
+  }
+  .num-btn {
+    min-height: 54px;
+  }
+}

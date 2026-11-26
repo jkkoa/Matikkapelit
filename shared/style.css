@@ -1,0 +1,514 @@
+/* Matikkapelit — Shared Design System (Consistent with Tavupeli) */
+
+@font-face {
+  font-family: 'MatikkaReader';
+  src: url('../fonts/andika-regular.woff2') format('woff2');
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MatikkaReader';
+  src: url('../fonts/andika-bold.woff2') format('woff2');
+  font-weight: 700 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --bg-board: #FAF8F3;
+  --bg-panel: #F2EFE7;
+  --bg-frame: #F3EFE6;
+  --surface: #FFFFFF;
+  --ink: #262A2F;
+  --ink-soft: #5E646C;
+  --border: #D8D3C8;
+  --border-strong: #BEB8AC;
+  --accent: #2E6FB8;
+  --accent-soft: #E9F1FA;
+  --ochre: #DF9E3E;
+  --ochre-soft: #FBF3E4;
+  --sage: #3D855A;
+  --sage-soft: #EAF4EE;
+  --bear-bg: #ECE7DE;
+  --bear-border: #4A443E;
+  --bear-ink: #36312C;
+  --danger: #C94842;
+  --danger-soft: #FAEBEA;
+  --radius-card: 22px;
+  --radius-btn: 14px;
+  --shadow-card: 0 8px 22px rgba(42, 38, 32, 0.08), 0 2px 5px rgba(42, 38, 32, 0.05);
+  --shadow-shell: 0 10px 30px rgba(42, 38, 32, 0.06);
+  --font-main: 'MatikkaReader', 'Nunito', 'Avenir Next', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg-board);
+  color: var(--ink);
+  font-family: var(--font-main);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.screen {
+  width: 100%;
+  height: 100dvh;
+}
+
+/* ==========================================================================
+   HUB LAUNCHER SCREEN
+   ========================================================================== */
+.hub-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: max(18px, env(safe-area-inset-top)) max(22px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(22px, env(safe-area-inset-left));
+  background: var(--bg-board);
+}
+
+.hub-shell {
+  width: 100%;
+  max-width: 1060px;
+  max-height: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 26px;
+  box-shadow: var(--shadow-shell);
+  padding: clamp(20px, 3vh, 36px) clamp(22px, 3.2vw, 42px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.6vh, 28px);
+  overflow-y: auto;
+}
+
+.hub-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.hub-title {
+  margin: 0;
+  font-size: clamp(1.7rem, 3vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+}
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: clamp(16px, 2.2vw, 26px);
+}
+
+.hub-grid.single-game {
+  grid-template-columns: minmax(260px, 340px);
+  justify-content: center;
+}
+
+.game-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: clamp(22px, 3vh, 32px) 22px;
+  border-radius: var(--radius-card);
+  border: 2px solid var(--border);
+  background: var(--bg-board);
+  color: var(--ink);
+  text-decoration: none;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(42, 38, 32, 0.045);
+  transition: transform 95ms ease, border-color 120ms ease, background-color 120ms ease, box-shadow 120ms ease;
+}
+
+.game-tile:hover {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+}
+
+.game-tile:active {
+  transform: scale(0.975);
+  border-color: var(--ink);
+  background: var(--surface);
+}
+
+.game-tile-art {
+  width: clamp(128px, 19vh, 176px);
+  height: clamp(128px, 19vh, 176px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.game-tile-art img,
+.game-tile-art svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.game-tile-title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.2vw, 1.65rem);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.game-tile-desc {
+  margin: 0;
+  font-size: 0.98rem;
+  color: var(--ink-soft);
+  line-height: 1.35;
+}
+
+/* ==========================================================================
+   SETUP SCREEN (Tavupeli pattern)
+   ========================================================================== */
+.setup-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(14px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  background: var(--bg-board);
+}
+
+.setup-shell {
+  width: 100%;
+  max-width: 980px;
+  max-height: 100%;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 24px;
+  box-shadow: var(--shadow-shell);
+  padding: clamp(18px, 2.5vh, 30px) clamp(20px, 2.8vw, 36px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vh, 22px);
+  overflow-y: auto;
+}
+
+.setup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.setup-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.setup-header h1 {
+  margin: 0;
+  font-size: clamp(1.55rem, 2.7vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.setup-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 2.8vw, 34px);
+  align-items: start;
+}
+
+.setup-col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vh, 20px);
+}
+
+.setup-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.setup-label {
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+
+.seg-row {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.seg-btn {
+  min-height: 48px;
+  min-width: 52px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-board);
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 1.02rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: transform 90ms ease, background-color 110ms ease, border-color 110ms ease;
+}
+
+.seg-btn:active {
+  transform: scale(0.96);
+}
+
+.seg-btn.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #FFFFFF;
+}
+
+.setup-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+/* ==========================================================================
+   BUTTONS & TOOLS
+   ========================================================================== */
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.btn-danger-outline {
+  min-height: 54px;
+  padding: 0 28px;
+  border-radius: var(--radius-btn);
+  font-family: inherit;
+  font-size: 1.12rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: transform 90ms ease, opacity 120ms ease, background-color 120ms ease;
+}
+
+.btn-primary:active:not(:disabled),
+.btn-secondary:active:not(:disabled),
+.btn-danger:active:not(:disabled),
+.btn-danger-outline:active:not(:disabled) {
+  transform: scale(0.975);
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: #FFFFFF;
+}
+
+.btn-primary:disabled {
+  background: #C9C4BA;
+  color: #F8F6F2;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--bg-board);
+  border-color: var(--border-strong);
+  color: var(--ink);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #FFFFFF;
+}
+
+.btn-danger-outline {
+  background: #FFFFFF;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.icon-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: transform 90ms ease, background-color 110ms ease, border-color 110ms ease;
+}
+
+.icon-btn:active {
+  transform: scale(0.94);
+  background: var(--bg-panel);
+}
+
+.icon-btn svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.icon-btn.muted {
+  color: var(--ink-soft);
+  background: var(--bg-board);
+}
+
+/* ==========================================================================
+   MODALS & END SCREEN (2-step protected exit + calm celebration)
+   ========================================================================== */
+.modal-backdrop,
+.end-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(34, 38, 43, 0.46);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 60;
+}
+
+.modal-card {
+  width: min(100%, 400px);
+  background: #FFFFFF;
+  border-radius: 22px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 16px 40px rgba(30, 28, 24, 0.18);
+  padding: 28px 24px;
+  text-align: center;
+}
+
+.modal-title {
+  margin: 0 0 22px;
+  font-size: 1.38rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.modal-actions button,
+.modal-actions a {
+  flex: 1 1 0;
+  padding: 0 14px;
+}
+
+.modal-actions-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modal-actions-stack button,
+.modal-actions-stack a {
+  width: 100%;
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.end-card {
+  width: min(100%, 460px);
+  background: #FFFFFF;
+  border-radius: 26px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 18px 46px rgba(30, 28, 24, 0.2);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+  animation: cardEnter 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.end-art {
+  width: clamp(170px, 26vh, 230px);
+  height: clamp(170px, 26vh, 230px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.end-art img,
+.end-art svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.end-line {
+  margin: 0;
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.end-actions {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+}
+
+.end-actions button,
+.end-actions a {
+  flex: 1 1 0;
+  padding: 0 14px;
+}
+
+@media (max-width: 860px) {
+  .setup-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
