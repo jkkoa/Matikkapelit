@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#FAF8F3" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Pikaluku" />
+  <title>Pikaluku – Matikkapelit</title>
+  <link rel="manifest" href="../../manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="../../icons/icon-192.svg" />
+  <link rel="apple-touch-icon" href="../../icons/icon-192.svg" />
+  <link rel="stylesheet" href="../../shared/style.css" />
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <!-- SETUP SCREEN -->
+  <main id="setup-screen" class="screen setup-screen">
+    <div class="setup-shell">
+      <header class="setup-header">
+        <div class="setup-header-left">
+          <a id="btn-setup-home" class="icon-btn" href="../../index.html" aria-label="Päävalikko"></a>
+          <h1>Pikaluku</h1>
+        </div>
+        <button id="btn-setup-mute" type="button" class="icon-btn" aria-label="Äänet"></button>
+      </header>
+
+      <div class="setup-grid">
+        <section class="setup-col">
+          <div class="setup-group">
+            <span class="setup-label">Alue</span>
+            <div id="setup-range" class="seg-row" role="group" aria-label="Lukualue"></div>
+          </div>
+
+          <div class="setup-group">
+            <span class="setup-label">Muoto</span>
+            <div id="setup-format" class="seg-row" role="group" aria-label="Esitysmuoto"></div>
+          </div>
+        </section>
+
+        <section class="setup-col">
+          <div class="setup-group">
+            <span class="setup-label">Näyttöaika</span>
+            <div id="setup-speed" class="seg-row" role="group" aria-label="Näyttöaika"></div>
+          </div>
+
+          <div class="setup-group">
+            <span class="setup-label">Tila</span>
+            <div id="setup-mode" class="seg-row" role="group" aria-label="Pelitila"></div>
+          </div>
+
+          <div class="setup-group">
+            <span class="setup-label">Kierros</span>
+            <div id="setup-length" class="seg-row" role="group" aria-label="Kierroksen pituus"></div>
+          </div>
+        </section>
+      </div>
+
+      <footer class="setup-footer">
+        <button id="btn-start" type="button" class="btn-primary">Aloita peli</button>
+      </footer>
+    </div>
+  </main>
+
+  <!-- GAME SCREEN -->
+  <main id="game-screen" class="screen pikaluku-screen hidden">
+    <header class="game-topbar">
+      <div id="progress-dots" class="progress-dots" aria-label="Edistyminen"></div>
+      <div class="topbar-tools">
+        <button id="btn-peek" type="button" class="btn-peek hidden" aria-label="Vilkaisu">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <span>Vilkaisu</span>
+        </button>
+        <button id="btn-mute" type="button" class="icon-btn" aria-label="Äänet"></button>
+        <button id="btn-exit" type="button" class="icon-btn" aria-label="Sulje peli"></button>
+      </div>
+    </header>
+
+    <section class="stage-zone">
+      <div id="stage-card" class="stage-card">
+        <div id="stimulus-layer" class="stimulus-layer"></div>
+        <div id="reveal-badge" class="reveal-badge hidden" aria-live="polite"></div>
+        <div id="flash-bar" class="flash-bar" aria-hidden="true">
+          <div id="flash-bar-fill" class="flash-bar-fill"></div>
+        </div>
+
+        <!-- CURTAIN OVERLAY -->
+        <div id="curtain" class="curtain">
+          <div class="curtain-inner">
+            <button id="btn-curtain-look" type="button" class="curtain-cta">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M2 12s3.8-6.5 10-6.5S22 12 22 12s-3.8 6.5-10 6.5S2 12 2 12z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <span>Katso</span>
+            </button>
+            <div id="curtain-question" class="curtain-question hidden" aria-hidden="true">?</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="answer-dock">
+      <!-- 1P KEYPAD -->
+      <div id="keypad" class="keypad" role="group" aria-label="Valitse määrä"></div>
+
+      <!-- CONTINUE BAR (after correct verification in 1P mode) -->
+      <div id="next-bar" class="dock-action-bar hidden">
+        <button id="btn-next" type="button" class="btn-primary btn-next">Seuraava</button>
+      </div>
+
+      <!-- TAULU / GAME MASTER DOCK -->
+      <div id="teacher-bar" class="dock-action-bar hidden">
+        <button id="btn-gm-peek" type="button" class="btn-secondary">Vilkaisu</button>
+        <button id="btn-gm-reveal" type="button" class="btn-primary">Näytä</button>
+        <button id="btn-gm-next" type="button" class="btn-primary hidden">Seuraava</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- 2-STEP PROTECTED EXIT MODAL -->
+  <div id="exit-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="exit-title-1">
+    <div class="modal-card">
+      <div id="exit-step-1" class="modal-body">
+        <h2 id="exit-title-1" class="modal-title">Sulje peli?</h2>
+        <div class="modal-actions">
+          <button id="btn-modal-cancel" type="button" class="btn-secondary">Jatka</button>
+          <button id="btn-modal-step2" type="button" class="btn-danger-outline">Lopeta</button>
+        </div>
+      </div>
+      <div id="exit-step-2" class="modal-body hidden">
+        <h2 class="modal-title">Minne haluat?</h2>
+        <div class="modal-actions-stack">
+          <button id="btn-modal-confirm" type="button" class="btn-primary">Asetuksiin</button>
+          <a href="../../index.html" class="btn-secondary">Päävalikkoon</a>
+          <button id="btn-modal-back" type="button" class="btn-danger-outline">Peruuta</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- END OF ROUND SCREEN -->
+  <div id="end-screen" class="end-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="end-line">
+    <div class="end-card">
+      <div class="end-art">
+        <img src="../../img/karhu-win.webp" alt="" draggable="false" />
+      </div>
+      <p id="end-line" class="end-line">Hienosti nähty!</p>
+      <div class="end-actions">
+        <a href="../../index.html" class="btn-secondary">Valikkoon</a>
+        <button id="btn-end-again" type="button" class="btn-primary">Uusi kierros</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/audio.js"></script>
+  <script src="../../shared/ui.js"></script>
+  <script src="../../shared/scheduler.js"></script>
+  <script src="../../shared/quantities.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#FAF8F3" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Matikkapelit" />
+  <title>Matikkapelit</title>
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="./icons/icon-192.svg" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.svg" />
+  <link rel="stylesheet" href="./shared/style.css" />
+</head>
+<body>
+  <main class="screen hub-screen">
+    <div class="hub-shell">
+      <header class="hub-header">
+        <h1 class="hub-title">Matikkapelit</h1>
+        <button id="btn-mute" type="button" class="icon-btn" aria-label="Äänet"></button>
+      </header>
+
+      <nav id="hub-grid" class="hub-grid" aria-label="Valitse peli"></nav>
+    </div>
+  </main>
+
+  <script src="./shared/audio.js"></script>
+  <script src="./shared/ui.js"></script>
+  <script src="./shared/games.js"></script>
+  <script>
+    (() => {
+      window.MatikkaUI.registerSW('./sw.js');
+      window.MatikkaUI.wireMuteButton(document.getElementById('btn-mute'));
+
+      const grid = document.getElementById('hub-grid');
+      const readyGames = (window.MATIKKA_GAMES || []).filter(g => g.ready);
+      if (readyGames.length === 1) {
+        grid.classList.add('single-game');
+      }
+
+      grid.innerHTML = readyGames.map(game => `
+        <a class="game-tile" href="${game.href}">
+          <div class="game-tile-art">
+            <img src="${game.art}" alt="" draggable="false" />
+          </div>
+          <h2 class="game-tile-title">${game.title}</h2>
+          <p class="game-tile-desc">${game.desc}</p>
+        </a>
+      `).join('');
+
+      grid.addEventListener('click', () => {
+        window.MatikkaAudio.unlock();
+        window.MatikkaAudio.playTap();
+      });
+    })();
+  </script>
+</body>
+</html>
