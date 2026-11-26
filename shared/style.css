@@ -506,6 +506,38 @@ html, body {
   padding: 0 14px;
 }
 
+/* ==========================================================================
+   SHARED QUANTITY HAND IMAGES (1-5 single, 6-10 mirrored pair)
+   ========================================================================== */
+.qty-hands {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(12px, 3vw, 38px);
+}
+
+.qty-hand {
+  height: 86%;
+  max-height: 310px;
+  width: auto;
+  max-width: 44%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+}
+
+.qty-hands.single .qty-hand {
+  height: 92%;
+  max-height: 335px;
+  max-width: 72%;
+}
+
+.qty-hand.mirror {
+  transform: scaleX(-1);
+}
+
 @media (max-width: 860px) {
   .setup-grid {
     grid-template-columns: 1fr;

@@ -6,7 +6,20 @@ window.MatikkaQuantities = (() => {
   const INK = '#262A2F';
   const CREAM_PLATE = '#FAF8F3';
   const PLATE_RIM = '#D8D3C8';
-  const HAND_FILL = '#F2DEC4';
+
+  // Resolve ../img/hands/ relative to shared/quantities.js regardless of page depth
+  const HANDS_BASE = (() => {
+    const src = document.currentScript && document.currentScript.src;
+    return src ? new URL('../img/hands/', src).href : '../../img/hands/';
+  })();
+
+  // Preload all 5 hand assets so 1.0 s flashes never pop in late on iPad
+  if (typeof Image !== 'undefined') {
+    for (let i = 1; i <= 5; i++) {
+      const preload = new Image();
+      preload.src = `${HANDS_BASE}hand-${i}.webp`;
+    }
+  }
 
   function pick(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
@@ -239,87 +252,22 @@ window.MatikkaQuantities = (() => {
     `;
   }
 
-  /* 5. ULTRA-SIMPLE UNIFORM SILHOUETTE HANDS (Sormet)
-   * One identical flat hand silhouette across 1-10:
-   * - Zero creases, fingernails, shading, or folded-knuckle clutter
-   * - Wide finger separation so every count 1-5 (and 5+n) reads instantly in a 1 s flash
-   */
-  function svgSimpleHand(count, cx, cy, scale = 1, mirror = false) {
-    // Wide-splayed raised finger layouts: { x, y, len, rot }
-    const layouts = {
-      1: [
-        { x: -18, y: 10, len: 108, rot: -8 }
-      ],
-      2: [
-        { x: -22, y: 10, len: 106, rot: -16 },
-        { x:   4, y:  6, len: 112, rot:   8 }
-      ],
-      3: [
-        { x: -26, y: 10, len: 102, rot: -20 },
-        { x:  -2, y:  6, len: 112, rot:  -2 },
-        { x:  22, y: 10, len: 104, rot:  18 }
-      ],
-      4: [
-        { x: -29, y: 12, len: 100, rot: -25 },
-        { x: -10, y:  6, len: 110, rot:  -8 },
-        { x:  10, y:  6, len: 110, rot:   8 },
-        { x:  29, y: 12, len:  98, rot:  25 }
-      ],
-      5: [
-        { x: -34, y: 40, len:  76, rot: -60 }, // clear side thumb
-        { x: -26, y: 12, len: 100, rot: -22 },
-        { x:  -8, y:  6, len: 110, rot:  -7 },
-        { x:  11, y:  6, len: 108, rot:   8 },
-        { x:  29, y: 12, len:  96, rot:  24 }
-      ]
-    };
-
-    const fingers = layouts[count] || layouts[5];
-    const fw = 21;
-
-    const shapes = () => {
-      const fSvg = fingers.map(f => `
-        <g transform="translate(${f.x}, ${f.y}) rotate(${f.rot})">
-          <rect x="${-fw / 2}" y="${-f.len}" width="${fw}" height="${f.len + 14}" rx="${fw / 2}" />
-        </g>
-      `).join('');
-
-      return `
-        ${fSvg}
-        <rect x="-24" y="54" width="48" height="34" rx="12" />
-        <rect x="-44" y="-4" width="88" height="72" rx="34" />
-      `;
-    };
-
-    const sx = mirror ? -scale : scale;
-    return `
-      <g transform="translate(${cx}, ${cy}) scale(${sx}, ${scale})">
-        <!-- Unified clean outer outline (no internal overlap strokes) -->
-        <g fill="${INK}" stroke="${INK}" stroke-width="11" stroke-linejoin="round" stroke-linecap="round">
-          ${shapes()}
-        </g>
-        <!-- Flat clean interior fill (zero creases, fingernails, or shading) -->
-        <g fill="${HAND_FILL}" stroke="none">
-          ${shapes()}
-        </g>
-      </g>
-    `;
-  }
-
+  /* 5. STORYBOOK HANDS (Sormet: approved uniform closed-wrist WebP assets) */
   function renderFingers(n) {
-    const W = 540;
-    const H = 300;
-    let inner = '';
-    if (n <= 5) {
-      inner = svgSimpleHand(n, W / 2, 176, 1.12, false);
-    } else {
-      inner += svgSimpleHand(5, 140, 180, 0.96, true);
-      inner += svgSimpleHand(n - 5, 400, 180, 0.96, false);
+    const clamped = Math.max(1, Math.min(10, n));
+    if (clamped <= 5) {
+      return `
+        <div class="qty-hands single" role="img" aria-label="${clamped} sormea">
+          <img class="qty-hand" src="${HANDS_BASE}hand-${clamped}.webp" alt="" draggable="false" />
+        </div>
+      `;
     }
+    const rightCount = clamped - 5;
     return `
-      <svg viewBox="0 0 ${W} ${H}" class="qty-svg" role="img" aria-label="${n} sormea">
-        ${inner}
-      </svg>
+      <div class="qty-hands pair" role="img" aria-label="${clamped} sormea">
+        <img class="qty-hand mirror" src="${HANDS_BASE}hand-5.webp" alt="" draggable="false" />
+        <img class="qty-hand" src="${HANDS_BASE}hand-${rightCount}.webp" alt="" draggable="false" />
+      </div>
     `;
   }
 
