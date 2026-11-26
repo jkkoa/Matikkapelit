@@ -1,5 +1,5 @@
 /* Matikkapelit — Offline PWA Service Worker */
-const CACHE_NAME = 'matikkapelit-cache-v1';
+const CACHE_NAME = 'matikkapelit-cache-v2';
 
 const CORE_ASSETS = [
   './',

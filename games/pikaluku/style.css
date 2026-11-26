@@ -284,19 +284,20 @@
   line-height: 1;
 }
 
-/* ANSWER DOCK — CONSTANT RESERVED HEIGHT SO STAGE NEVER JUMPS */
+/* ANSWER DOCK — CONSTANT FIXED HEIGHT SO STAGE NEVER JUMPS */
 .answer-dock {
-  flex: 0 0 auto;
+  --dock-h: clamp(134px, 21vh, 174px);
+  flex: 0 0 var(--dock-h);
+  height: var(--dock-h);
   width: min(100%, 760px);
   margin: 0 auto;
-  min-height: clamp(134px, 21vh, 176px);
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
 
 .answer-dock.compact {
-  min-height: clamp(76px, 11vh, 96px);
+  --dock-h: clamp(76px, 11vh, 96px);
 }
 
 .keypad {
